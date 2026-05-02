@@ -1,6 +1,6 @@
 """
 自助旅遊 App - FastAPI Backend
-整合 Ollama (Qwen3.6 26B) + OpenStreetMap + 即時匯率
+整合 Ollama (Qwen3.6 27B) + OpenStreetMap + 即時匯率
 """
 
 import os

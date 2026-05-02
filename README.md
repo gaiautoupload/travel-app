@@ -1,6 +1,6 @@
 # 🌍 自助旅遊助手 - 操作手冊
 
-> 基於 Ollama (Qwen3.6 26B) + OpenStreetMap + 即時匯率的離線旅遊應用程式
+> 基於 Ollama (Qwen3.6 27B) + OpenStreetMap + 即時匯率的離線旅遊應用程式
 
 ---
 
@@ -23,7 +23,7 @@
 | 作業系統 | Windows 10/11, macOS, Linux |
 | Python | 3.10 或以上 |
 | Ollama | 最新版本 |
-| 記憶體 | 建議 32GB+ (26B 模型需要約 16GB VRAM/RAM) |
+| 記憶體 | 建議 32GB+ (27B 模型需要約 16GB VRAM/RAM) |
 | 網路 | 需要連線 (OpenStreetMap、匯率 API) |
 
 ---
@@ -37,7 +37,7 @@
 ### 2. 下載模型
 
 ```bash
-ollama pull qwen3.6:26b
+ollama pull qwen3.6:27b
 ```
 
 確認模型已安裝：
@@ -96,7 +96,7 @@ http://localhost:8000
 ### 1. 🌐 AI 翻譯
 
 - 支援多國語言互譯
-- 使用 Qwen3.6 26B 進行高品質翻譯
+- 使用 Qwen3.6 27B 進行高品質翻譯
 - 保留原文語氣和風格
 
 **使用方式：**
@@ -153,7 +153,7 @@ http://localhost:8000
 
 ### 什麼是冷啟動？
 
-Ollama 在第一次被呼叫時，需要將模型載入記憶體。對於 26B 參數的模型，這可能需要 **3-5 分鐘**。
+Ollama 在第一次被呼叫時，需要將模型載入記憶體。對於 27B 參數的模型，這可能需要 **3-5 分鐘**。
 
 ### 應用程式的防護措施
 
@@ -187,7 +187,7 @@ ollama serve
 ollama list
 
 # 如果模型不存在，下載它
-ollama pull qwen3.6:26b
+ollama pull qwen3.6:27b
 ```
 
 ### 問題 2：回應超時
@@ -249,7 +249,7 @@ GET /api/health
 ```json
 {
   "status": "ok",
-  "ollama_model": "qwen3.6:26b",
+  "ollama_model": "qwen3.6:27b",
   "ollama_url": "http://localhost:11434",
   "time": "2026-05-01T18:30:00"
 }
@@ -265,7 +265,7 @@ POST /api/warmup
 ```json
 {
   "status": "warmed_up",
-  "model": "qwen3.6:26b"
+  "model": "qwen3.6:27b"
 }
 ```
 
@@ -390,17 +390,17 @@ POST /api/assistant
 | 變數 | 預設值 | 說明 |
 |------|--------|------|
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama 伺服器位址 |
-| `OLLAMA_MODEL` | `qwen3.6:26b` | 使用的模型名稱 |
+| `OLLAMA_MODEL` | `qwen3.6:27b` | 使用的模型名稱 |
 
 **設定方式 (Windows)：**
 ```bash
-set OLLAMA_MODEL=qwen3.6:26b
+set OLLAMA_MODEL=qwen3.6:27b
 python main.py
 ```
 
 **設定方式 (Linux/macOS)：**
 ```bash
-export OLLAMA_MODEL=qwen3.6:26b
+export OLLAMA_MODEL=qwen3.6:27b
 python main.py
 ```
 

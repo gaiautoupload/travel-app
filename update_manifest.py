@@ -1,6 +1,7 @@
 import json
+import os
 
-manifest_path = r"C:\Users\III-AIPC-02\.nanobot\workspace\travel_app\static\manifest.json"
+manifest_path = os.path.join(os.path.dirname(__file__), "static", "manifest.json")
 
 with open(manifest_path, "r", encoding="utf-8") as f:
     data = json.load(f)

@@ -28,3 +28,6 @@ _cleanup.py
 # 忽略 Windows
 Thumbs.db
 *.log
+
+# 忽略 Git 憑證
+.git-credentials
