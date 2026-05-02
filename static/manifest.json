@@ -1,0 +1,67 @@
+{
+    "name": "Travel Planner",
+    "short_name": "Travel",
+    "description": "AI 自助旅行行程規劃工具",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4F46E5",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/static/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/static/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "travel",
+        "productivity"
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "行程規劃",
+            "short_name": "行程",
+            "description": "建立新的行程規劃",
+            "url": "/?tab=plan",
+            "icons": [
+                {
+                    "src": "/static/icons/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "即時翻譯",
+            "short_name": "翻譯",
+            "description": "離線即時翻譯",
+            "url": "/?tab=translate",
+            "icons": [
+                {
+                    "src": "/static/icons/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "路線規劃",
+            "short_name": "路線",
+            "description": "規劃最佳路線",
+            "url": "/?tab=route",
+            "icons": [
+                {
+                    "src": "/static/icons/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

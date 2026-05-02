@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Planner - AI 自助旅行規劃</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+</head>
+<body>
+    <!-- PWA Install Banner -->
+    <div id="install-banner" class="install-banner" style="display:none;">
+        <span>📱 安裝為 App 使用，支援離線模式</span>
+        <button id="install-btn">安裝</button>
+        <button id="dismiss-install" class="close-btn">&times;</button>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator" style="display:none;">
+        ⚠️ 離線模式 - 部分功能受限
+    </div>
+
+    <!-- Offline Status Indicator -->
+    <div id="offlineBanner" class="offline-banner" style="display:none;">
+        <span>📴 離線模式</span>
+        <span id="queueCount"></span>
+        <button onclick="SyncQueue.process()" class="sync-btn">同步</button>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>🗺️ Travel Planner</h1>
+                <span id="connection-status" class="status-dot online"></span>
+                <span id="status-text">線上</span>
+            </div>
+            <div class="header-right">
+                <button id="btn-theme" class="icon-btn" title="切換主題">🌙</button>
+                <button id="btn-export-all" class="icon-btn" title="匯出所有行程">📥</button>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="plan">📝 規劃行程</button>
+            <button class="tab-btn" data-tab="trips">📋 我的行程</button>
+            <button class="tab-btn" data-tab="budget">💰 預算追蹤</button>
+            <button class="tab-btn" data-tab="recommend">🎯 智慧推薦</button>
+            <button class="tab-btn" data-tab="weather">🌤️ 天氣查詢</button>
+        </nav>
+
+        <!-- Tab: Plan -->
+        <div id="tab-plan" class="tab-content active">
+            <div class="card">
+                <h2>🤖 AI 行程規劃</h2>
+                <form id="plan-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>目的地 *</label>
+                            <input type="text" id="destination" placeholder="例如：東京、大阪、京都" required>
+                        </div>
+                        <div class="form-group">
+                            <label>天數 *</label>
+                            <input type="number" id="days" min="1" max="30" value="3" required>
+                        </div>
+                        <div class="form-group">
+                            <label>開始日期</label>
+                            <input type="date" id="start-date">
+                        </div>
+                        <div class="form-group">
+                            <label>預算等級</label>
+                            <select id="budget">
+                                <option value="">不限</option>
+                                <option value="經濟">經濟</option>
+                                <option value="中等" selected>中等</option>
+                                <option value="豪華">豪華</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>興趣偏好</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="interests" value="美食"> 美食</label>
+                                <label><input type="checkbox" name="interests" value="購物"> 購物</label>
+                                <label><input type="checkbox" name="interests" value="景點"> 景點</label>
+                                <label><input type="checkbox" name="interests" value="文化"> 文化</label>
+                                <label><input type="checkbox" name="interests" value="自然"> 自然</label>
+                                <label><input type="checkbox" name="interests" value="夜生活"> 夜生活</label>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>同行人數</label>
+                            <select id="travelers">
+                                <option value="一個人">一個人</option>
+                                <option value="兩個人" selected>兩個人</option>
+                                <option value="家庭(3-4人)">家庭(3-4人)</option>
+                                <option value="團體(5人以上)">團體(5人以上)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="btn-plan">
+                        <span class="btn-text">開始規劃</span>
+                        <span class="btn-loading" style="display:none;">規劃中...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Plan Result -->
+            <div id="plan-result" class="card" style="display:none;">
+                <div class="result-header">
+                    <h2 id="result-title"></h2>
+                    <div class="result-actions">
+                        <button id="btn-save-trip" class="btn-secondary">💾 儲存行程</button>
+                        <button id="btn-export-trip" class="btn-secondary">📥 匯出 JSON</button>
+                    </div>
+                </div>
+                <div id="result-content"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Trips -->
+        <div id="tab-trips" class="tab-content">
+            <div class="card">
+                <div class="trips-header">
+                    <h2>📋 我的行程</h2>
+                    <div class="trips-controls">
+                        <input type="text" id="search-trips" placeholder="搜尋行程...">
+                        <select id="filter-destination">
+                            <option value="">所有目的地</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="trips-list" class="trips-list">
+                    <div class="empty-state">
+                        <p>還沒有行程，快去規劃吧！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Detail Modal -->
+            <div id="trip-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modal-title"></h2>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div id="modal-body"></div>
+                    <div class="modal-footer">
+                        <button id="btn-edit-trip" class="btn-secondary">✏️ 編輯</button>
+                        <button id="btn-delete-trip" class="btn-danger">🗑️ 刪除</button>
+                        <button id="btn-export-modal" class="btn-secondary">📥 匯出</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Budget -->
+        <div id="tab-budget" class="tab-content">
+            <div class="card">
+                <h2>💰 預算追蹤器</h2>
+                <div class="budget-summary">
+                    <div class="budget-item">
+                        <span class="label">總預算</span>
+                        <span class="value" id="total-budget">NT$ 0</span>
+                    </div>
+                    <div class="budget-item">
+                        <span class="label">已花費</span>
+                        <span class="value spent" id="total-spent">NT$ 0</span>
+                    </div>
+                    <div class="budget-item">
+                        <span class="label">剩餘</span>
+                        <span class="value remaining" id="total-remaining">NT$ 0</span>
+                    </div>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="budget-progress-fill"></div>
+                    </div>
+                    <span id="budget-percent">0%</span>
+                </div>
+                <form id="expense-form" class="expense-form">
+                    <div class="form-row">
+                        <select id="expense-trip" required>
+                            <option value="">選擇行程</option>
+                        </select>
+                        <input type="text" id="expense-category" placeholder="類別 (餐飲/交通/住宿...)" required>
+                        <input type="number" id="expense-amount" placeholder="金額 (TWD)" min="0" required>
+                        <input type="text" id="expense-note" placeholder="備註">
+                        <button type="submit" class="btn-primary">新增</button>
+                    </div>
+                </form>
+                <div id="expense-list" class="expense-list"></div>
+
+                <!-- Budget Setting -->
+                <div class="budget-setting">
+                    <h3>設定行程預算</h3>
+                    <div class="form-row">
+                        <select id="budget-trip">
+                            <option value="">選擇行程</option>
+                        </select>
+                        <input type="number" id="budget-amount" placeholder="總預算 (TWD)" min="0">
+                        <button id="btn-set-budget" class="btn-primary">設定預算</button>
+                    </div>
+                </div>
+
+                <!-- Category Chart -->
+                <div class="chart-container">
+                    <h3>花費分類</h3>
+                    <canvas id="category-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Recommend -->
+        <div id="tab-recommend" class="tab-content">
+            <div class="card">
+                <h2>🎯 智慧推薦</h2>
+                <div class="recommend-controls">
+                    <select id="recommend-trip">
+                        <option value="">選擇行程</option>
+                    </select>
+                    <button id="btn-recommend" class="btn-primary">取得推薦</button>
+                </div>
+                <div id="recommend-result" class="recommend-result"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Weather -->
+        <div id="tab-weather" class="tab-content">
+            <div class="card">
+                <h2>🌤️ 天氣查詢</h2>
+                <div class="weather-controls">
+                    <input type="text" id="weather-location" placeholder="輸入地點...">
+                    <button id="btn-weather" class="btn-primary">查詢天氣</button>
+                </div>
+                <div id="weather-result" class="weather-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display:none;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="/static/indexeddb.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
